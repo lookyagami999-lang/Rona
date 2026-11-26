@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+ <html lang="th">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>ระบบจัดการงานสาธารณสุข</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+         * { font-family: 'Sarabun', sans-serif; }
+         .gradient-bg { background: linear-gradient(135deg, #006699 0%, #009966 100%); }
+         .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+         .pulse-dot { animation: pulse 2s infinite; }
+         @keyframes pulse {
+             0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+             70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+             100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+         }
+     </style>
+ </head>
+ <body class="bg-gray-50 min-h-screen">
+     <!-- ส่วนหัว -->
+     <header class="gradient-bg text-white py-6 shadow-lg">
+         <div class="container mx-auto px-4">
+             <div class="flex items-center justify-between">
+                 <div>
+                     <h1 class="text-[clamp(1.25rem,3vw,2rem)] font-bold">
+                         <i class="fa fa-heartbeat mr-2"></i>ระบบจัดการงานสาธารณสุข
+                     </h1>
+                     <p class="text-blue-100 mt-1">เทศบาลตำบล — แดชบอร์ดข้อมูลและบริการประชาชน</p>
+                 </div>
+                 <div class="hidden md:flex items-center space-x-4">
+                     <a href="login.html" class="bg-white/20 px-3 py-1 rounded-full text-sm hover:bg-white/30">
+                         <i class="fa fa-user-o mr-1"></i> เจ้าหน้าที่
+                     </a>
+                     <span class="inline-flex items-center bg-white/20 px-3 py-1 rounded-full text-sm">
+                         <span class="w-2 h-2 bg-green-400 rounded-full mr-2 pulse-dot"></span>
+                         เปิดให้บริการ
+                     </span>
+                 </div>
+             </div>
+         </div>
+     </header>
+     <!-- เมนูนำทาง -->
+     <nav class="bg-white shadow-sm sticky top-0 z-50">
+         <div class="container mx-auto px-4">
+             <div class="flex overflow-x-auto py-3 space-x-4 text-sm font-medium">
+                 <a href="#dashboard" class="whitespace-nowrap text-blue-600 border-b-2 border-blue-600 pb-1">
+                     <i class="fa fa-tachometer mr-1"></i> ภาพรวม
+                 </a>
+                 <a href="#complaint" class="whitespace-nowrap text-gray-600 hover:text-blue-600">
+                     <i class="fa fa-commenting-o mr-1"></i> ร้องเรียน
+                 </a>
+                 <a href="#activity" class="whitespace-nowrap text-gray-600 hover:text-blue-600">
+                     <i class="fa fa-calendar mr-1"></i> กิจกรรม
+                 </a>
+             </div>
+         </div>
+     </nav>
+     <main class="container mx-auto px-4 py-6">
+         <!-- ส่วนแดชบอร์ด -->
+         <section id="dashboard" class="mb-12">
+             <h2 class="text-xl font-semibold mb-6">📊 ภาพรวมระบบ</h2>
+             
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                 <div class="bg-white rounded-xl p-5 shadow-sm stat-card card-hover border-t-4 border-blue-500">
+                     <div class="flex justify-between items-start">
+                         <div>
+                             <p class="text-gray-500 text-sm">เรื่องร้องเรียนทั้งหมด</p>
+                             <p class="text-3xl font-bold text-gray-800 mt-1" id="totalComplaints">--</

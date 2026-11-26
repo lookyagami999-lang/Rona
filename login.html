@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+ <html lang="th">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>เข้าสู่ระบบ — เจ้าหน้าที่</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+         * { font-family: 'Sarabun', sans-serif; }
+         .gradient-bg { background: linear-gradient(135deg, #006699 0%, #009966 100%); }
+     </style>
+ </head>
+ <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+     <div class="w-full max-w-md px-4">
+         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+             <div class="gradient-bg p-6 text-center">
+                 <i class="fa fa-user-circle-o text-5xl text-white/80 mb-3"></i>
+                 <h1 class="text-xl font-bold text-white">ระบบเข้าสู่ระบบเจ้าหน้าที่</h1>
+                 <p class="text-blue-100 text-sm mt-1">แดชบอร์ดจัดการงานสาธารณสุข</p>
+             </div>
+             
+             <div class="p-6 space-y-5">
+                 <div id="errorMsg" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                     <i class="fa fa-exclamation-circle mr-2"></i>
+                     <span></span>
+                 </div>
+                 
+                 <form id="loginForm" class="space-y-4">
+                     <div>
+                         <label class="block text-sm font-medium text-gray-700 mb-1">
+                             <i class="fa fa-envelope-o mr-1 text-gray-500"></i> อีเมล
+                         </label>
+                         <input type="email" id="email" required
+                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                     </div>
+                     
+                     <div>
+                         <label class="block text-sm font-medium text-gray-700 mb-1">
+                             <i class="fa fa-lock mr-1 text-gray-500"></i> รหัสผ่าน
+                         </label>
+                         <input type="password" id="password" required
+                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                     </div>
+                     
+                     <button type="submit"
+                         class="w-full gradient-bg text-white py-3 rounded-lg font-medium hover:opacity-90 transition">
+                         <i class="fa fa-sign-in mr-2"></i> เข้าสู่ระบบ
+                     </button>
+                 </form>
+                 
+                 <p class="text-xs text-gray-500 text-center mt-4">
+                     ⚠️ สำหรับเจ้าหน้าที่เท่านั้น หากไม่มีบัญชี กรุณาติดต่อผู้ดูแลระบบ
+                 </p>
+             </div>
+         </div>
+     </div>
+     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+     
+     <script>
+         const firebaseConfig = {
+  apiKey: "AIzaSyCS_RiuGGH1tIv1Cl_nPtmq4IHsoDuiMMQ",
+  authDomain: "headlight--complant.firebaseapp.com",
+  databaseURL: "https://headlight--complant-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "headlight--complant",
+  storageBucket: "headlight--complant.firebasestorage.app",
+  messagingSenderId: "1009584768716",
+  appId: "1:1009584768716:web:b0c9691729e7accf4e2469",
+  measurementId: "G-M7YPCYXWCJ"
+         };
+         firebase.initializeApp(firebaseConfig);
+         const auth = firebase.auth();
+         const loginForm = document.getElementById('loginForm');
+         const errorMsg = document.getElementById('errorMsg');
+         auth.onAuthStateChanged(user => {
+             if (user) {
+                 window.location.href = 'admin.html';
+             }
+         });
+         loginForm.addEventListener('submit', e => {
+             e.preventDefault();
+             errorMsg.classList.add('hidden');
+             
+             const email = document.getElementById('email').value;
+             const password = document.getElementById('password').value;
+             auth.signInWithEmailAndPassword(email, password)
+                 .then(() => {})
+                 .catch(error => {
+                     errorMsg.classList.remove('hidden');
+                     errorMsg.querySelector('span').textContent = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+                 });
+         });
+     </script>
+ </body>
+ </html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+ <html lang="th">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>จัดการเรื่องร้องเรียน — เจ้าหน้าที่</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+         * { font-family: 'Sarabun', sans-serif; }
+         .gradient-bg { background: linear-gradient(135deg, #006699 0%, #009966 100%); }
+         .status-pending { background: #fef3c7; color: #92400e; }
+         .status-working { background: #dbeafe; color: #1e40af; }
+         .status-done { background: #d1fae5; color: #065f46; }
+     </style>
+ </head>
+ <body class="bg-gray-50 min-h-screen">
+     <header class="gradient-bg text-white py-4 shadow-lg">
+         <div class="container mx-auto px-4 flex justify-between items-center">
+             <h1 class="text-xl font-bold"><i class="fa fa-list-alt mr-2"></i>จัดการเรื่องร้องเรียน</h1>
+             <div class="flex items-center gap-3">
+                 <span id="userEmail" class="text-sm text-blue-100"></span>
+                 <button id="logoutBtn" class="bg-white/20 px-3 py-1 rounded-full text-sm hover:bg-white/30">
+                     <i class="fa fa-sign-out mr-1"></i> ออกจากระบบ
+                 </button>
+             </div>
+         </div>
+     </header>
+     <main class="container mx-auto px-4 py-6">
+         <div class="bg-white rounded-xl shadow-sm p-4 mb-6 flex justify-between items-center">
+             <h2 class="font-semibold">รายการเรื่องร้องเรียนทั้งหมด</h2>
+             <span class="text-sm text-gray-500">จำนวน: <span id="totalCount">0</span> รายการ</span>
+         </div>
+         <div id="complaintsList" class="space-y-4">
+             <div class="text-center py-10 text-gray-500">
+                 <i class="fa fa-spinner fa-spin text-2xl"></i>
+                 <p class="mt-2">กำลังโหลดข้อมูล...</p>
+             </div>
+         </div>
+     </main>
+     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+     
+     <script>
+         const firebaseConfig = {
+  apiKey: "AIzaSyCS_RiuGGH1tIv1Cl_nPtmq4IHsoDuiMMQ",
+  authDomain: "headlight--complant.firebaseapp.com",
+  databaseURL: "https://headlight--complant-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "headlight--complant",
+  storageBucket: "headlight--complant.firebasestorage.app",
+  messagingSenderId: "1009584768716",
+  appId: "1:1009584768716:web:b0c9691729e7accf4e2469",
+  measurementId: "G-M7YPCYXWCJ"
+         };
+         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+         const auth = firebase.auth();
+         const db = firebase.database();
+         const complaintsRef = db.ref('complaints');
+         auth.onAuthStateChanged(user => {
+             if (!user) {
+                 window.location.href = 'login.html';
+                 return;
+             }
+             document.getElementById('userEmail').textContent = user.email;
+             loadComplaints();
+         });
+         function loadComplaints() {
+             complaintsRef.on('value', snapshot => {
+                 const data = snapshot.val();
+                 const listEl = document.getElementById('complaintsList');
+                 let html = '';
+                 let count = 0;
+                 if (!data) {
+                     listEl.innerHTML = '<div class="text-center py-10 text-gray-500"><p>ยังไม่มีเรื่องร้องเรียน</p></div>';
+                     document.getElementById('totalCount').textContent = '0';
+                     return;
+                 }
+                 Object.keys(data).forEach(key => {
+                     const item = data[key];
+                     count++;
+                     
+                     let statusClass = 'status-pending';
+                     if (item.status === 'กำลังดำเนินการ') statusClass = 'status-working';
+                     if (item.status === 'เสร็จสิ้น') statusClass = 'status-done';
+                     html += `
+                     <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
+                         <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-3 mb-3">
+                             <div>
+                                 <span class="text-sm text-gray-500">${item.date || '-'}</span>
+                                 <h3 class="font-semibold text-lg">${item.type || 'ไม่ระบุประเภท'}</h3>
+                                 <p class="text-sm text-gray-600">${item.location || '-'}</p>
+                             </div>
+                             <select onchange="updateStatus('${key}', this.value)" 
+                                 class="px-3 py-1 rounded-full text-sm font-medium border-0 ${statusClass}">
+                                 <option value="รับเรื่อง" ${item.status === 'รับเรื่อง' ? 'selected' : ''}>รับเรื่อง</option>
+                                 <option value="กำลังดำเนินการ" ${item.status === 'กำลังดำเนินการ' ? 'selected' : ''}>กำลังดำเนินการ</option>
+                                 <option value="เสร็จสิ้น" ${item.status === 'เสร็จสิ้น' ? 'selected' : ''}>เสร็จสิ้น</option>
+                             </select>
+                         </div>
+                         <p class="text-gray-700 text-sm mb-2">${item.detail || '-'}</p>
+                         <p class="text-xs text-gray-400">ผู้แจ้ง: ${item.name || 'ไม่ระบุ'} | เบอร์: ${item.phone || 'ไม่ระบุ'}</p>
+                     </div>`;
+                 });
+                 listEl.innerHTML = html;
+                 document.getElementById('totalCount').textContent = count;
+             });
+         }
+         window.updateStatus = function(key, newStatus) {
+             complaintsRef.child(key).update({ status: newStatus })
+                 .then(() => alert('อัปเดตสถานะสำเร็จ'))
+                 .catch(err => alert('เกิดข้อผิดพลาด: ' + err));
+         };
+         document.getElementById('logoutBtn').addEventListener('click', () => {
+             if (confirm('ต้องการออกจากระบบใช่ไหม?')) {
+                 auth.signOut().then(() => window.location.href = 'login.html');
+             }
+         });
+     </script>
+ </body>
+ </html>
